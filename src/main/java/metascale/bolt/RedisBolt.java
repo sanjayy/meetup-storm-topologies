@@ -44,12 +44,12 @@ public class RedisBolt extends BaseRichBolt {
 	public void execute(Tuple input) {
         JSONObject rsvp = (JSONObject) input.getValueByField("rsvp");
         Object country = ((Map) rsvp.get("group")).get("group_country");
-        //System.out.println("country : " + country);
+        System.out.println("country : " + country);
         jedis.hincrBy("meetup_country", country.toString(), 1);
         Collection topics = ((Collection)((Map) rsvp.get("group")).get("group_topics"));
         for(Object topics_map:topics)
         {
-            //System.out.println(((Map)topics_map).get("url_key"));
+            System.out.println(((Map)topics_map).get("url_key"));
             jedis.hincrBy("topics", ((Map)topics_map).get("urlkey").toString(), 1);
             jedis.publish("meetup_topics", ((Map)topics_map).get("topic_name").toString());
         }

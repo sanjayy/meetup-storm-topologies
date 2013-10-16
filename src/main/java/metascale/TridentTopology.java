@@ -34,8 +34,8 @@ public class TridentTopology {
         storm.trident.TridentTopology topology = new storm.trident.TridentTopology();
 
         topology.newStream("meetup_rsvp_spout", meetup_rsvp_spout).parallelismHint(1)
-                .each(new Fields("rsvp"), new Extract(), new Fields("country"))
-                .groupBy(new Fields("country"))
+                .each(new Fields("rsvp"), new Extract(), new Fields("country", "response"))
+                .groupBy(new Fields("country", "response"))
                 .persistentAggregate(redis, new Count(), new Fields("cnt")).parallelismHint(1);
 
         Config conf = new Config();
@@ -64,8 +64,8 @@ public class TridentTopology {
 
             Object country = ((Map) rsvp.get("group")).get("group_country");
             Object response = rsvp.get("response");
-            System.out.println(" in split: " + country);
-            tridentCollector.emit(new Values(country.toString()));
+            System.out.println(" in extract: " + country + " : " + response);
+            tridentCollector.emit(new Values(country.toString(), response.toString()));
         }
 
 

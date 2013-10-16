@@ -7,6 +7,7 @@ package metascale.trident;
 
 import backtype.storm.task.IMetricsContext;
 import backtype.storm.tuple.Values;
+import org.apache.commons.lang3.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -34,9 +35,9 @@ public class RedisState<T> implements IBackingMap<T> {
 
         @Override
         public String build(List<Object> key) {
-            if (key.size() != 1)
-                throw new RuntimeException("Default KeyFactory does not support compound keys");
-            return (String) key.get(0);
+//            if (key.size() != 1)
+//                throw new RuntimeException("Default KeyFactory does not support compound keys");
+            return StringUtils.join(key,"-");
         }
     };
 
@@ -152,6 +153,7 @@ public class RedisState<T> implements IBackingMap<T> {
 
     @Override
     public List<T> multiGet(List<List<Object>> keys) {
+        System.out.println("in multiget " + keys);
         if (keys.size() > 0) {
             String[] stringKeys = new String[keys.size()];
             int index = 0;
@@ -187,7 +189,7 @@ public class RedisState<T> implements IBackingMap<T> {
             for (int i = 0; i < keys.size(); i++) {
                 keyValues[i * 2] = keyFactory.build(keys.get(i));
                 keyValues[i * 2 + 1] = new String(serializer.serialize(vals.get(i)));
-                System.out.println(" key: " + keyFactory.build(keys.get(i)));
+                System.out.println(" key: " + keyValues[i * 2] + " value: " + keyValues[i * 2 + 1]);
             }
 
             Jedis jedis = pool.getResource();
