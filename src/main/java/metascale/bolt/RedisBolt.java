@@ -49,7 +49,7 @@ public class RedisBolt extends BaseRichBolt {
         Collection topics = ((Collection)((Map) rsvp.get("group")).get("group_topics"));
         for(Object topics_map:topics)
         {
-            System.out.println(((Map)topics_map).get("url_key"));
+            //System.out.println(((Map)topics_map).get("url_key"));
             jedis.hincrBy("topics", ((Map)topics_map).get("urlkey").toString(), 1);
             jedis.publish("meetup_topics", ((Map)topics_map).get("topic_name").toString());
         }
